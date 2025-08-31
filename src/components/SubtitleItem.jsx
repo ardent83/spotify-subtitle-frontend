@@ -3,7 +3,7 @@ import { More } from 'iconsax-react';
 import { Like } from './Like';
 import useClickOutside from '../hooks/useClickOutside';
 
-function SubtitleItem({ subtitle, isActive, onLike, onSetActive, onEdit, onDelete, currentUser }) {
+function SubtitleItem({ subtitle, isActive, onLike, onToggleActive, onEdit, onDelete, currentUser }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const isOwner = currentUser?.user === subtitle.user;
     
@@ -39,7 +39,7 @@ function SubtitleItem({ subtitle, isActive, onLike, onSetActive, onEdit, onDelet
                         {menuOpen && (
                             <div className="absolute right-0 mt-1 w-32 bg-custom-gray-medium rounded-md border border-custom-gray z-10 p-1">
                                 <button onClick={handleEditClick} className="block w-full text-left px-4 py-2 text-sm hover:bg-custom-gray-dark rounded-t-md cursor-pointer border-b border-custom-gray-light">Edit</button>
-                                <button onClick={handleDeleteClick} className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-custom-gray-dark rounded-b-md cursor-pointer">Delete</button>
+                                <button onClick={handleDeleteClick} className="block w-full text-left px-4 py-2 text-sm text-sttbg-stateerror hover:bg-custom-gray-dark rounded-b-md cursor-pointer">Delete</button>
                             </div>
                         )}
                     </div>
@@ -55,12 +55,11 @@ function SubtitleItem({ subtitle, isActive, onLike, onSetActive, onEdit, onDelet
                     {subtitle.likes_count}
                 </span>
                 <button 
-                    onClick={() => onSetActive(subtitle.id)} 
-                    disabled={isActive} 
+                    onClick={() => onToggleActive(subtitle)} 
                     type='button' 
-                    className={`text-xs font-bold rounded-full px-4 py-1 cursor-pointer ${isActive ? 'bg-spotify-green text-black border border-transparent' : 'bg-transparent text-white border border-custom-gray'}`}
+                    className={`text-xs font-bold rounded-full px-4 py-1 cursor-pointer ${isActive ? 'bg-statewarning text-white border border-transparent' : 'bg-transparent text-white border border-custom-gray'}`}
                 >
-                    {isActive ? 'Active' : 'Set Active'}
+                    {isActive ? 'Deactivate' : 'Set Active'}
                 </button>
             </div>
         </div>

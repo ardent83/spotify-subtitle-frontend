@@ -117,9 +117,18 @@ function SearchView({ setView, onEdit, currentUser }) {
         const response = await api.toggleLike(subtitleId);
         setSubtitles(p => p.map(s => s.id === subtitleId ? { ...s, is_liked_by_current_user: response.is_liked, likes_count: response.likes_count } : s));
     };
-    const handleSetActive = async (subtitleId) => {
-        await api.setActiveSubtitle(subtitleId);
-        setActiveSubId(subtitleId);
+    const handleToggleActive = async (subtitle) => {
+        try {
+            if (activeSubId === subtitle.id) {
+                await api.unsetActiveSubtitle(subtitle.song_id);
+                setActiveSubId(null);
+            } else {
+                await api.setActiveSubtitle(subtitle.id);
+                setActiveSubId(subtitle.id);
+            }
+        } catch (err) { 
+            setError("Failed to update active status."); 
+        }
     };
     const handleDelete = async (subtitleId) => {
         await api.deleteSubtitle(subtitleId);
@@ -160,7 +169,16 @@ function SearchView({ setView, onEdit, currentUser }) {
                 {songData && <SongPreviewCard songData={songData} />}
                 <div className="w-full flex flex-col items-center gap-2">
                     {subtitles.map(sub => (
-                        <SubtitleItem key={sub.id} subtitle={sub} isActive={sub.id === activeSubId} onLike={handleLike} onSetActive={handleSetActive} onEdit={onEdit} onDelete={handleDelete} currentUser={currentUser} />
+                        <SubtitleItem 
+                            key={sub.id} 
+                            subtitle={sub} 
+                            isActive={sub.id === activeSubId} 
+                            onLike={handleLike} 
+                            onToggleActive={handleToggleActive}
+                            onEdit={onEdit}
+                            onDelete={handleDelete}
+                            currentUser={currentUser}
+                        />
                     ))}
                 </div>
                 {loadingMore && <div className="flex justify-center py-4"><PulseLoader size={8} color="var(--color-custom-gray)" /></div>}

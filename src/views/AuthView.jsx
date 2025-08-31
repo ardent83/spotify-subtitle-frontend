@@ -1,35 +1,82 @@
 import React, { useState } from 'react';
-import { Login, LoginCurve } from 'iconsax-react';
-import { openInNewTab } from '../utils';
-import { PulseLoader } from 'react-spinners';
+import * as api from '../services/api';
+import Header from '../components/Header';
+import LoginForm from './LoginForm';
+import RegisterForm from './RegisterForm';
+import PasswordResetForm from './PasswordResetForm';
+import { inputClasses } from '../style';
 
-function AuthView() {
+function AuthView({ onLoginSuccess, setView }) {
+    const [authSubView, setAuthSubView] = useState('login');
+    const [errors, setErrors] = useState({});
+    const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleSpotifyLogin = () => {
+    const viewMap = { login: "Login", register: "Register", reset: "Reset Password" };
+
+    const handleApiCall = async (apiFunction, formData, successMessage) => {
+        setErrors({});
+        setMessage('');
         setLoading(true);
-        const spotifyLoginUrl = 'http://localhost:8000/accounts/spotify/login/';
-        openInNewTab(spotifyLoginUrl);
-        
-        window.close(); 
+        try {
+            await apiFunction(formData);
+            setMessage(successMessage);
+            return true;
+        } catch (err) {
+            try {
+                const parsedError = JSON.parse(err.message);
+                setErrors(parsedError);
+            } catch (e) {
+                setErrors({ non_field_errors: [err.message] });
+            }
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        const formData = Object.fromEntries(new FormData(e.target));
+        const success = await handleApiCall(api.login, formData, 'Login successful!');
+        if (success) onLoginSuccess();
+    };
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        const formData = Object.fromEntries(new FormData(e.target));
+        if (formData.password !== formData.password2) {
+            setErrors({ password2: ["Passwords do not match."] });
+            return;
+        }
+        const success = await handleApiCall(api.register, formData, 'Registration successful! Please check your email to verify your account.');
+        if (success) setAuthSubView('login');
+    };
+
+    const handleResetRequest = async (e) => {
+        e.preventDefault();
+        const { email } = Object.fromEntries(new FormData(e.target));
+        await handleApiCall(() => api.passwordReset(email), null, 'Password reset email sent! Check your terminal for the link.');
+    };
+
+    const renderForm = () => {
+        switch (authSubView) {
+            case 'register':
+                return <RegisterForm onRegister={handleRegister} onSwitchToLogin={() => setAuthSubView('login')} loading={loading} errors={errors} inputClasses={inputClasses} />;
+            case 'reset':
+                return <PasswordResetForm onResetRequest={handleResetRequest} onBackToLogin={() => setAuthSubView('login')} loading={loading} errors={errors} inputClasses={inputClasses} />;
+            case 'login':
+            default:
+                return <LoginForm onLogin={handleLogin} onSwitchToRegister={() => setAuthSubView('register')} onForgotPassword={() => setAuthSubView('reset')} loading={loading} errors={errors} inputClasses={inputClasses} />;
+        }
     };
 
     return (
-        <div className="p-4 h-full flex flex-col justify-center items-center text-center">
-            <h1 className="text-3xl font-bold text-white mb-4">Welcome to Subtitle Manager</h1>
-            <p className="text-zinc-400 mb-8">
-                Log in or sign up in one click using your Spotify account.
-            </p>
-            <button 
-                onClick={handleSpotifyLogin} 
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-3 bg-spotify-green text-black text-3 font-semibold rounded-full py-3 uppercase tracking-wider disabled:opacity-50"
-            >
-                {loading ? <PulseLoader size={6} color="var(--color-black)" /> : <LoginCurve size="24" color='var(--color-black)' />}
-                {loading ? 'Redirecting...' : 'Continue with Spotify'}
-            </button>
+        <div className="p-3 pb-0 bg-custom-dark h-full max-h-[600px]">
+            <Header title={viewMap[authSubView]} onBack={() => setView('guest')} />
+            {message && <p className="text-green-500 text-center">{message}</p>}
+            {renderForm()}
         </div>
     );
 }
-
 export default AuthView;
