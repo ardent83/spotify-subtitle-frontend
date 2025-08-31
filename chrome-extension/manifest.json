@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Spotify Subtitle Extension",
+  "version": "1.0",
+  "description": "Fetch and display subtitles dynamically from an API",
+  "permissions": [
+    "tabs",
+    "scripting",
+    "cookies",
+    "identity",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://open.spotify.com/*",
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*",
+    "https://ardent-subino-ardent.kubarcloud.net/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_icon": "Spotify_Primary_Logo_RGB_Green.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["content.js"],
+      "matches": ["*://open.spotify.com/*"]
+    }
+  ]
+}

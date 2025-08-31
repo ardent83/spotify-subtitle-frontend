@@ -9,7 +9,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   build: {
-    outDir: "C:\\Users\\User\\Desktop\\under the carpet\\tr\\ui-for-react-build\\popup", 
+    outDir: "chrome-extension\\popup", 
     emptyOutDir: true, 
     rollupOptions: {
       output: {
