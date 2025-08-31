@@ -1,5 +1,4 @@
 async function fetchSubtitleFromAPI(songId) {
-    // const API_DOMAIN_URL = 'https://ardent-subino-ardent.kubarcloud.net';
     const API_DOMAIN_URL = 'http://127.0.0.1:8000';
     const storageData = await chrome.storage.local.get('preferredLanguage');
     const preferredLanguage = storageData.preferredLanguage || 'en';

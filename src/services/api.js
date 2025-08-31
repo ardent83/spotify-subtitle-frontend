@@ -1,9 +1,10 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const API_BASE_URL = `${BASE_URL}/api`;
 
 async function getCsrfToken() {
     if (window.chrome && chrome.runtime && chrome.runtime.id) {
         try {
-            const cookie = await chrome.cookies.get({ url: 'http://localhost:8000', name: 'csrftoken' });
+            const cookie = await chrome.cookies.get({ url: BASE_URL, name: 'csrftoken' });
             return cookie ? cookie.value : null;
         } catch (e) { return null; }
     } else {
