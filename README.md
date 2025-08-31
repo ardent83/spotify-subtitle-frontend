@@ -13,3 +13,6 @@ Run npm run build.
 Load the unpacked chrome-extension/ directory in chrome://extensions.
 
 ##### Note: If *VITE_BASE_URL=http://localhost:8000* is changed, *API_DOMAIN_URL* in background.js must also be changed.
+
+
+#### BackEnd: [spotify-subtitle-backend](https://github.com/ardent83/spotify-subtitle-backend)
